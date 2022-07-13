@@ -11,6 +11,7 @@ from sklearn.metrics import classification_report
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
 data = pd.read_csv('KSI.csv')
 
 #printing percentage of missing values for each feature
@@ -24,7 +25,7 @@ sns.heatmap(data.isnull(), yticklabels=False,cmap='Greens')
 #shape
 print(data.shape)
 # Dropping columns where missing values were greater than 80%
-drop_column = ['OFFSET','FATAL_NO','PEDTYPE','PEDACT','PEDCOND','CYCLISTYPE','CYCACT','CYCCOND','CYCLIST','MOTORCYCLE','TRUCK','TRSN_CITY_VEH','EMERG_VEH','SPEEDING','REDLIGHT','ALCOHOL','DISABILITY','ObjectId','X','Y','INDEX_']
+drop_column = ['OFFSET','FATAL_NO','PEDTYPE','PEDACT','PEDCOND','CYCLISTYPE','CYCACT','CYCCOND','ObjectId','X','Y','INDEX_']
 data.drop(drop_column, axis=1, inplace=True)
 print(data.shape)
 print(data.isna().sum()/len(data)*100)
@@ -35,8 +36,8 @@ print(data.describe())
 #Changing the property damage and non-fatal columns to Non-Fatal¶
 data['ACCLASS'] = np.where(data['ACCLASS'] == 'Property Damage Only', 'Non-Fatal', data['ACCLASS'])
 data['ACCLASS'] = np.where(data['ACCLASS'] == 'Non-Fatal Injury', 'Non-Fatal', data['ACCLASS'])
-
 data['ACCLASS'].unique()
+
 
 ## Verifying columns with object data type
 print(data.select_dtypes(["object"]).columns)
@@ -94,3 +95,45 @@ Num_accident.plot(
 plt.show()
 
 #From the data above, accidents happened more from June to October
+
+#Categorizing Fatal vs. non-Fatal Incident (non-unique i.e: one accident is counted depending upon involved parties)
+plt.xticks(rotation=70)
+plt.tight_layout()
+sns.catplot(x='YEAR', kind='count', data=data,  hue='ACCLASS')
+plt.xticks(rotation=0)
+plt.tight_layout()
+
+
+#Looking at area where accident happens
+Region_data = data['DISTRICT'].value_counts()
+plt.figure(figsize=(12,6))
+plt.ylabel('Number of Accidents')
+Region_data.plot(kind='bar',color=list('rgbkmc'))
+plt.show()
+
+#data cleaning
+data.shape
+data.columns
+
+#Driving condition for accidents
+#AG_DRIV
+#REDLIGHT
+#ALCOHOL
+#DISABILITY
+#SPEEDING
+
+#Type of vehicles involved
+#AUTOMOBILE
+#MOTORCYCLE
+#TRUCK
+#CYCLIST
+#EMERG_VEH
+#TRNS_CITY_VEH
+
+#We noted that if the value of these columns are nan which means no
+#Therefore we need to transform yes to 1, nan to 0
+
+#Changing the nan to 0 and Yes to 1 for alcohol
+data['ALCOHOL'] = np.where(data['ALCOHOL'] == 'Yes',1,0)
+
+#Changing the nan to 0 and Yes to 1 for DISABILITY

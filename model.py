@@ -10,7 +10,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.metrics import classification_report
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+from sklearn.preprocessing import StandardScaler
 
 data = pd.read_csv('KSI.csv')
 #printing percentage of missing values for each feature
@@ -137,7 +137,7 @@ clean_data = data[['ACCNUM','YEAR','HOUR','MONTH','DAY','MINUTE','SECOND',
 #PEDESTRIAN
 #PASSENGER
 
-#We noted that if the value of these columns are nan which means no
+#We noted that if the value of these columns are nan which means No
 #Therefore we need to transform yes to 1, nan to 0
 
 #Changing the nan to 0 and Yes to 1 for alcohol
@@ -154,8 +154,8 @@ clean_data['CYCLIST'] = np.where(clean_data['CYCLIST'] == 'Yes',1,0)
 clean_data['EMERG_VEH'] = np.where(clean_data['EMERG_VEH'] == 'Yes',1,0)
 clean_data['TRSN_CITY_VEH'] = np.where(clean_data['TRSN_CITY_VEH'] == 'Yes',1,0)
 
-clean_data['PEDESTRIAN'] = np.where(clean_data['TRSN_CITY_VEH'] == 'Yes',1,0)
-clean_data['PASSENGER'] = np.where(clean_data['TRSN_CITY_VEH'] == 'Yes',1,0)
+clean_data['PEDESTRIAN'] = np.where(clean_data['PEDESTRIAN'] == 'Yes',1,0)
+clean_data['PASSENGER'] = np.where(clean_data['PASSENGER'] == 'Yes',1,0)
 
 # Neighbourhood is identical with Hood ID so we drop Neighbourhood
 # duplicated or not related data , we drop.
@@ -175,9 +175,9 @@ clean_data['VISIBILITY'].isna().sum()
 #23
 clean_data['RDSFCOND'].isna().sum()
 #For district,visibility,rdsfcon, fill nan with Other
-clean_data['DISTRICT'] = clean_data['DISTRICT'].fillna('Other')
-clean_data['VISIBILITY'] = clean_data['VISIBILITY'].fillna('Other')
-clean_data['RDSFCOND'] = clean_data['RDSFCOND'].fillna('Other')
+#clean_data['DISTRICT'] = clean_data['DISTRICT'].fillna('Other')
+#clean_data['VISIBILITY'] = clean_data['VISIBILITY'].fillna('Other')
+#clean_data['RDSFCOND'] = clean_data['RDSFCOND'].fillna('Other')
 
 objdtype_cols = clean_data.select_dtypes(["object"]).columns
 clean_data[objdtype_cols] = clean_data[objdtype_cols].astype('category')
@@ -190,4 +190,37 @@ clean_data_target = data['ACCLASS']
 clean_data_target = np.where(clean_data_target == 'Fatal',1,0)
 
 clean_data = pd.get_dummies(clean_data, columns=['VISIBILITY','RDSFCOND','DISTRICT','LIGHT'])
+scaler = StandardScaler() #define the instance
+scaler.fit_transform(clean_data)
+
+
+#Feature selection
+import statsmodels.api as sm
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import RidgeCV, LassoCV, Ridge, Lasso
+
+X_1 = sm.add_constant(clean_data)
+
+#Fitting sm.OLS model
+model = sm.OLS(clean_data_target,X_1).fit()
+model.pvalues
+model.pvalues>0.1
+
+X_droped_0 = clean_data.drop(['ACCNUM','MONTH','DAY','LATITUDE','LONGITUDE',
+                              'SECOND','HOOD_ID','MOTORCYCLE','CYCLIST',
+                              'AUTOMOBILE','EMERG_VEH','ALCOHOL','VISIBILITY_Clear',
+                              'VISIBILITY_Fog, Mist, Smoke, Dust','VISIBILITY_Freezing Rain',
+                              'VISIBILITY_Other','VISIBILITY_Rain','VISIBILITY_Snow',
+                              'VISIBILITY_Strong wind','LIGHT_Dark','LIGHT_Dark, artificial',
+                              'LIGHT_Dawn','LIGHT_Dawn, artificial','LIGHT_Daylight, artificial',
+                              'LIGHT_Dusk','LIGHT_Other'],axis=1)
+
+X_droped_0.shape
+print(X_droped_0.isna().sum()/len(X_droped_0)*100)
+
+
+#Model for prediction
+
 

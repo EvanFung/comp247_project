@@ -11,6 +11,8 @@ from sklearn.metrics import classification_report
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
 data = pd.read_csv('KSI.csv')
 #printing percentage of missing values for each feature
@@ -222,5 +224,14 @@ print(X_droped_0.isna().sum()/len(X_droped_0)*100)
 
 
 #Model for prediction
+y = clean_data_target
+X = X_droped_0
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=17, stratify=y)
+lr = LogisticRegression(random_state=0)
+lr.fit(X_train,y_train)
+y_pred=lr.predict(X_test)
 
-
+# Get the accuracy score
+acc=accuracy_score(y_test, y_pred)
+print("[Logistic regression algorithm] accuracy_score: {:.3f}.".format(acc))
+print('metric on test set\n', classification_report(y_test, y_pred))

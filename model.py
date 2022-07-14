@@ -235,3 +235,8 @@ y_pred=lr.predict(X_test)
 acc=accuracy_score(y_test, y_pred)
 print("[Logistic regression algorithm] accuracy_score: {:.3f}.".format(acc))
 print('metric on test set\n', classification_report(y_test, y_pred))
+
+#To do
+#imbalanced classes handling
+#pipelines
+#grid search

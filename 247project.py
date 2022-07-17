@@ -423,9 +423,11 @@ clf_svm=SVC()
 
 #Random search
 param_svm = [
-    {'kernel': ['linear', 'poly','rbf'], 
+    {'kernel': ['poly','rbf'], 
      'C': [0.01,0.1, 1],
-     'gamma': [0.01, 0.05, 0.1]}
+     'gamma': [0.01, 0.05, 0.1],
+     'degree':[2,3]}
+
   ]
 
 random_search_svm = RandomizedSearchCV(estimator=clf_svm, param_distributions=param_svm, cv=3, scoring='accuracy', refit = True, verbose = 3)

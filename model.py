@@ -245,3 +245,65 @@ print('metric on test set\n', classification_report(y_test, y_pred))
 #imbalanced classes handling
 #pipelines
 #grid search
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import metrics
+from sklearn.model_selection import GridSearchCV
+from time import time
+
+# Modeling Decision Trees
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) # 
+# Create Decision Tree classifer object
+clf = DecisionTreeClassifier(max_depth=3, criterion = 'entropy', random_state=42)
+# Train Decision Tree Classifer
+clf = clf.fit(X_train,y_train)
+#Validate using 10 cross fold
+
+clf = DecisionTreeClassifier(min_samples_split=20,criterion = 'entropy',
+                                random_state=42)
+clf.fit(X_train, y_train)
+scores= cross_val_score(\
+   clf, X_train, y_train, cv=10, scoring='f1_macro')
+
+print("mean: {:.3f} (std: {:.3f})".format(scores.mean(),
+                                          scores.std()),
+                                         end="\n\n" )
+#Predict using the test set
+y_pred = clf.predict(X_test)
+#Model Accuracy, how often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+"""
+Tunning the model
+
+"""
+# set of parameters to test
+param_grid = {
+              "min_samples_split": [2, 10, 20],
+              "max_depth": [None, 2, 5, 10],
+              "min_samples_leaf": [1, 5, 10],
+              "max_leaf_nodes": [None, 5, 10, 20],
+              }
+print("-- Grid Parameter Search via 10-fold CV")
+dt = DecisionTreeClassifier(criterion = 'entropy')
+grid_search = GridSearchCV(dt,
+                               param_grid=param_grid,
+                               cv=10)
+start = time()
+grid_search.fit(X_train, y_train)
+
+print(("\nGridSearchCV took {:.2f} "
+           "seconds for {:d} candidate "
+           "parameter settings.").format(time() - start,
+                len(grid_search.cv_results_)))
+
+print('Best Parameters are:',grid_search.best_params_)
+
+#Predict the response for test dataset using the best parameters
+dt = DecisionTreeClassifier(max_depth =5,min_samples_split= 2, criterion = 'entropy', min_samples_leaf= 10, random_state=42 )
+dt.fit(X_train,y_train)
+y_pred = dt.predict(X_test)
+#Model Accuracy, how often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+

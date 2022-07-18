@@ -407,6 +407,30 @@ print("recall",recall_score(y_test, y_test_pred))
 print(classification_report(y_test, y_test_pred))
 
 
+"""After Tuning"""
+
+from sklearn.model_selection import GridSearchCV
+
+grid_values = {'penalty': ['l1', 'l2'], 'C':[0.01,0.1, 1],'solver':['sag','saga']}
+grid_search = GridSearchCV(lr, param_grid = grid_values,scoring = 'recall',cv=5,return_train_score=True)
+grid_search.fit(X_train_prepared, y_train)
+
+#Best parameters
+print('Best parameters',grid_search.best_params_)
+print('Best estimator',grid_search.best_estimator_)
+cvres = grid_search.cv_results_
+best_logistic_model = grid_search.best_estimator_
+best_logistic_model.predict(X_test_prepared)
+
+
+from sklearn.metrics import accuracy_score
+print("After Tuning:")
+print("Accuracy", accuracy_score(y_test, y_test_pred))
+print("Precision", precision_score(y_test, y_test_pred))
+print("Recall", recall_score(y_test, y_test_pred))
+print(classification_report(y_test, y_test_pred))
+
+
 """# Model Training,Tuning and Testing
 
 ##SVM

@@ -378,20 +378,42 @@ full_pipeline = ColumnTransformer([
         ("cat", cat_pipeline, cat_attribs),
     ])
 
-X_train_prepared = full_pipeline.fit_transform(X_train)
-X_train_prepared.toarray()
+
 
 """# Model Training,Tuning and Testing
 
 ##Logistic regression
+
+Before Tuning
+"""
+#Logistic regression
+from sklearn.linear_model import LogisticRegression
+
+lr = LogisticRegression(random_state=17)
+X_train_prepared = full_pipeline.fit_transform(X_train)
+X_train_prepared.toarray()
+#test
+X_test_prepared = full_pipeline.transform(X_test)
+X_train_prepared.shape
+lr.fit(X_train_prepared,y_train)
+#predict
+y_test_pred=lr.predict(X_test_prepared)
+print("Training Accuracy",lr.score(X_train_prepared, y_train))
+print("Before Tuning:")
+
+print("accuracy", accuracy_score(y_test, y_test_pred))
+print("precison",precision_score(y_test, y_test_pred))
+print("recall",recall_score(y_test, y_test_pred))
+print(classification_report(y_test, y_test_pred))
+
+
+"""# Model Training,Tuning and Testing
 
 ##SVM
 
 Before Tuning
 """
 
-X_test_prepared = full_pipeline.transform(X_test)
-X_train_prepared.shape
 
 #SVM
 from sklearn.svm import SVC

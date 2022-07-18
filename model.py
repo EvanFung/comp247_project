@@ -17,6 +17,7 @@ from sklearn.metrics import accuracy_score
 data = pd.read_csv('KSI.csv')
 #printing percentage of missing values for each feature
 data.replace('<Null>', np.nan, inplace=True)
+data.replace('None', np.nan, inplace=True)
 data.replace(' ',np.nan,inplace=True)
 print(data.isna().sum()/len(data)*100)
 #The following heatmap shows the features having maximum missing values
@@ -191,6 +192,8 @@ clean_data['LONGITUDE']=clean_data['LATITUDE'].astype('int')
 clean_data_target = data['ACCLASS']
 clean_data_target = np.where(clean_data_target == 'Fatal',1,0)
 
+clean_data.columns
+
 clean_data = pd.get_dummies(clean_data, columns=['VISIBILITY','RDSFCOND','DISTRICT','LIGHT'])
 scaler = StandardScaler() #define the instance
 scaler.fit_transform(clean_data)
@@ -230,6 +233,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 lr = LogisticRegression(random_state=0)
 lr.fit(X_train,y_train)
 y_pred=lr.predict(X_test)
+
+X.columns
 
 # Get the accuracy score
 acc=accuracy_score(y_test, y_pred)
